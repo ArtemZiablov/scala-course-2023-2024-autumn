@@ -10,6 +10,7 @@ object HomeworkSpecification extends Properties("Homework"):
   include(BooleanOperatorsSpecification)
   include(FermatNumbersSpecification)
   include(LookAndSaySequenceSpecification)
+  include(KolakoskiSequence)
 
 end HomeworkSpecification
 
@@ -102,6 +103,48 @@ object LookAndSaySequenceSpecification extends Properties("LookAndSaySequenceSpe
 
   property("lookAndSaySequenceElement") = forAll { (n: Int) =>
     (n > 0) ==> (lookAndSaySequenceElement(n).toString() == loop(n - 1, "1"))
+  }
+}
+
+
+object KolakoskiSequence extends Properties("KolakoskiSequence"){
+  import `Kolakoski sequence`._
+  import arbitraries.given Arbitrary[Int]
+
+  // https://rosettacode.org/wiki/Kolakoski_sequence#Kotlin
+  extension (arr: Array[Int])
+    def nextInCycle(index: Int): Int = arr(index % arr.length)
+
+    def kolakoskiElement(len: Int): Array[Int] = {
+      val s = new Array[Int](len)
+      var i = 0
+      var k = 0
+      while (true) {
+        s(i) = arr.nextInCycle(k)
+        if (s(k) > 1) {
+          (1 until s(k)).foreach { _ =>
+            i += 1
+            if (i == len) return s
+            s(i) = s(i - 1)
+          }
+        }
+        i += 1
+        if (i == len) return s
+        k += 1
+      }
+      s
+    }
+
+  property("Parameter n should be greater then zero") = forAll { (n: Int) =>
+    throws(classOf[IllegalArgumentException]) {
+      val newN = if n == 0 then 0 else -Math.abs(n)
+      kolakoski(newN)
+    }
+  }
+
+  val ia = Array(1, 2)
+  property("kolakoskiElement") = forAll { (n: Int) =>
+    (n > 0) ==> (kolakoski(n) == ia.kolakoskiElement(n).last)
   }
 
 }

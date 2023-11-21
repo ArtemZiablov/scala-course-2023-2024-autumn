@@ -109,18 +109,37 @@ object Homework :
             else res
           nextNumber(number / 10, newCurrent, newCount, newRes)
 
-      def getLookAndSayElementN(n: Int): BigInt =
-        @tailrec
-        def iterate(current: BigInt, count: Int): BigInt =
-          if count >= n then current
-          else iterate(nextNumber(current, current % 10, 0, 0), count + 1)
-
-        iterate(BigInt(1), 1)
+      @tailrec
+      def getLookAndSayElementN(n: Int, current: BigInt, count: Int): BigInt =
+        if count >= n then current
+        else getLookAndSayElementN(n, nextNumber(current, current % 10, 0, 0), count + 1)
 
       require(n > 0, "Argument n should be greater then zero")
-      getLookAndSayElementN(n)
-
+      getLookAndSayElementN(n, BigInt(1), 1)
+    
   end `Look-and-say Sequence`
 
+
+
+  object `Kolakoski sequence`:
+
+    val kolakoski: Int => Int = (n) =>
+      @tailrec
+      def getElem(sequence: String, n: BigInt, currentElementIndex: Int): Int =
+        if sequence.length() >= n then
+          sequence((n - 1).toInt).asDigit
+        else
+          val newSubSequence =
+            if sequence(currentElementIndex) == '2' then
+              if sequence.last.toString == "2" then "11" else "22"
+            else
+              if sequence.last.toString == "2" then "1" else "2"
+          val newSequence = sequence + newSubSequence
+          getElem(newSequence, n, currentElementIndex + 1)
+
+      require(n > 0, "Parameter n should be greater than zero")
+      getElem("122", n, 2)
+
+  end `Kolakoski sequence`
 
 end Homework
