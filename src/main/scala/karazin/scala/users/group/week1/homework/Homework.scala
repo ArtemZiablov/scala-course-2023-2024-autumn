@@ -46,6 +46,7 @@ object Homework :
       if b then false
       else true
 
+
     def and(left: => Boolean, right: => Boolean): Boolean =
       if left then right
       else false
