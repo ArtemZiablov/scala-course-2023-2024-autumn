@@ -31,7 +31,7 @@ object BooleanOperatorsSpecification extends Properties("Boolean Operators"):
   property("or") = forAll { (pair: (Boolean, Boolean)) =>
     val (left, right) = pair
 
-    or(left, right) == left || right
+    or(left, right) == (left || right)
   }
 
 end BooleanOperatorsSpecification

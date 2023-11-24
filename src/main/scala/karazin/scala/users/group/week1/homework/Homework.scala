@@ -1,7 +1,5 @@
 package karazin.scala.users.group.week1.homework
 
-import sun.misc.Signal.raise
-
 import java.lang
 import scala.annotation.tailrec
 import scala.language.postfixOps
@@ -49,26 +47,27 @@ object Homework :
       else true
 
     def and(left: Boolean, right: Boolean): Boolean =
-      if left then right
+      if !left then false
+      else if right then true
       else false
 
     def or(left: Boolean, right: Boolean): Boolean =
-      if left then left
-      else right
+      if left then true
+      else if right then true
+      else false
 
   end `Boolean Operators`
 
   object `Fermat Numbers` :
-    import `Boolean Operators`.or
 
     val multiplication: (BigInt, BigInt) =>  BigInt =  (firstNum, secondNum) =>
       @tailrec
       def multiplicationTailRec(firstNum: BigInt, secondNum: BigInt, result: BigInt): BigInt =
-        if or(firstNum == 0, secondNum == 0) then result
+        if firstNum == 0 || secondNum == 0 then result
+        else if secondNum < 0 then multiplicationTailRec(firstNum, secondNum + 1, result - firstNum)
         else multiplicationTailRec(firstNum, secondNum - 1, result + firstNum)
 
-      val sign = if firstNum.signum == secondNum.signum then 1 else -1
-      sign * multiplicationTailRec(firstNum.abs, secondNum.abs, 0)
+      multiplicationTailRec(firstNum, secondNum, 0)
 
     val power: (BigInt, BigInt) => BigInt = (baseNumber, exponent) =>
       @tailrec
