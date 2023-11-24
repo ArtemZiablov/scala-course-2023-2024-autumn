@@ -25,5 +25,3 @@ object arbitraries:
   given Arbitrary[(Int, Int)] = Arbitrary(smallIntegerPair)
 
   given Arbitrary[BigInt => BigInt] = Arbitrary(higherOrderFunction)
-  
-  //given Arbitrary[]
