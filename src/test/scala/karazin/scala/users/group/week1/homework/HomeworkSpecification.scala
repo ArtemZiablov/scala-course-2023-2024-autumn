@@ -28,10 +28,19 @@ object BooleanOperatorsSpecification extends Properties("Boolean Operators"):
     and(left, right) == (left && right)
   }
 
+  property("check eagerness works for method and") = forAll { (left:Boolean) =>
+    val newLeft = if left then false else left
+    !and(newLeft, throw new IllegalArgumentException("method and is not eager"))
+  }
+
   property("or") = forAll { (pair: (Boolean, Boolean)) =>
     val (left, right) = pair
-
     or(left, right) == (left || right)
+  }
+
+  property("check eagerness works for method or") = forAll { (left: Boolean) =>
+    val newLeft = if !left then true else left
+    or(newLeft, throw new IllegalArgumentException("method or is not eager"))
   }
 
 end BooleanOperatorsSpecification
