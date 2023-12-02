@@ -44,6 +44,11 @@ object ZeroSpecification extends Properties("Zero"):
     zero.toInt == 0
   }
 
+  property("Zero from Int") = forAll { (int: Int) =>
+    val newZero = if int != 0 then 0 else int
+    Zero.fromInt(newZero) == fromInt(0)
+  }
+
   property("Zero equals") = forAll { (zero1: Zero, zero2: Zero) =>
     (zero1 == zero2) && (isZero(zero1) == isZero(zero2))
   }
@@ -84,6 +89,10 @@ object SuccSpecification extends Properties("Succ"):
     }
   }
 
+  property("Succ to Int") = forAll { (succ: Succ) =>
+    succ.toInt == toInt(succ)
+  }
+
   property("Successor`s equals") = forAll { (left: Succ, right: Succ) =>
     (left == right) == (toInt(left) == toInt(right))
   }
@@ -91,7 +100,7 @@ object SuccSpecification extends Properties("Succ"):
 end SuccSpecification
 
 object NatSpecification extends Properties("Nat"):
-  import arbitraries.{given Arbitrary[Succ], given Arbitrary[Nat] }
+  import arbitraries.{given Arbitrary[Succ], given Arbitrary[Nat], given Arbitrary[Int] }
 
   property("Check if Nat is Zero") = forAll { (nat: Nat) =>
     if toInt(nat) == 0 then isZero(nat) else !isZero(nat)
@@ -124,6 +133,25 @@ object NatSpecification extends Properties("Nat"):
     throws(classOf[IllegalArgumentException]) {
       if toInt(left) < toInt(right) then left - right
       else right - successor(left)
+    }
+  }
+
+  property("Nat to Int") = forAll { (nat: Nat) =>
+    nat.toInt == toInt(nat)
+  }
+
+  property("Nat from positive Int") = forAll { (int: Int) =>
+    val newInt = if int < 0 then abs(int) else int
+    Zero.fromInt(newInt) == fromInt(newInt)
+  }
+
+  property("Nat from negative Int throws exception") = forAll { (int: Int) =>
+    throws(classOf[IllegalArgumentException]){
+      val newInt =
+        if int < 0 then int
+        else if int > 0 then -int
+        else -1
+      Zero.fromInt(newInt)
     }
   }
 
