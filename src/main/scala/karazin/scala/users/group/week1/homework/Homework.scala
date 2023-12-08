@@ -47,12 +47,12 @@ object Homework :
       else true
 
 
-    def and(left: => Boolean, right: => Boolean): Boolean =
+    def and(left: Boolean, right: => Boolean): Boolean =
       if left then right
       else false
 
 
-    def or(left: => Boolean, right: => Boolean): Boolean =
+    def or(left: Boolean, right: => Boolean): Boolean =
       if left then true
       else right
 
