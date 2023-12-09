@@ -35,7 +35,7 @@ object Homework:
 
     @targetName("addition")
     infix def +(that: Rational): Rational =
-      val newDenom = Math.abs(this.denom * that.denom) / gcd(this.denom, that.denom)
+      val newDenom = this.denom * that.denom
       val newNumer = this.numer * (newDenom / this.denom) + that.numer * (newDenom / that.denom)
       Rational(newNumer, newDenom)
 
@@ -50,7 +50,7 @@ object Homework:
 
     @targetName("subtraction")
     infix def -(that: Rational): Rational =
-      val newDenom: Int = Math.abs(this.denom * that.denom) / gcd(this.denom, that.denom)
+      val newDenom: Int = this.denom * that.denom
       val newNumer: Int = this.numer * (newDenom / this.denom) - that.numer * (newDenom / that.denom)
       Rational(newNumer, newDenom)
 
@@ -84,14 +84,48 @@ object Homework:
       if b == 0 then a else gcd(b, a % b)
 
     private lazy val g = gcd(abs(x), y)
-
-    override def equals(other: Any): Boolean =
-      if (!other.isInstanceOf[Rational]) then false
-      else
-        val that = other.asInstanceOf[Rational]
-        (this.numer == that.numer) && (this.denom == that.denom)
-
+    
+    def canEqual(other: Any): Boolean = other.isInstanceOf[Rational]
+    
+    override def equals(other: Any): Boolean = other match {
+      case that: Rational =>
+        (that canEqual this) &&
+          numer == that.numer &&
+          denom == that.denom &&
+          this.hashCode() == that.hashCode()
+      case _ => false
+    }
+    
+    override def hashCode(): Int = {
+      val state = Seq(numer, denom)
+      state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
+    }
+    
   end Rational
+
+
+  given int2Rational: Conversion[Int, Rational] with
+    def apply(int: Int): Rational = new Rational(int)
+
+  extension (int: Int)
+    @targetName("addition")
+    def +(that: Rational): Rational = int2Rational(int) + that
+
+    @targetName("subtraction")
+    def -(that: Rational): Rational = int2Rational(int) - that
+
+    @targetName("multiplication")
+    def *(that: Rational): Rational = int2Rational(int) * that
+
+    @targetName("division")
+    def /(that: Rational): Rational = int2Rational(int) / that
+
+
+  def main(args: Array[String]): Unit = {
+    val int: Int = 42
+    val rational: Rational = Rational(13, 15)
+    println(int - rational)
+  }
 
 end Homework
 
