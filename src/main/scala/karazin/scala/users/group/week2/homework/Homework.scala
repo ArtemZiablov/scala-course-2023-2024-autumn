@@ -76,7 +76,7 @@ object Homework:
     @targetName("division")
     infix def /(that: Int): Rational =
       require(that != 0, "division by zero")
-      Rational(this.numer, this.denom * that)
+      Rational(this.numer * that.sign, abs(this.denom * that))
 
     override def toString: String = s"${this.numer}/${this.denom}"
 
@@ -103,7 +103,6 @@ object Homework:
     
   end Rational
 
-
   given int2Rational: Conversion[Int, Rational] with
     def apply(int: Int): Rational = new Rational(int)
 
@@ -120,13 +119,5 @@ object Homework:
     @targetName("division")
     def /(that: Rational): Rational = int2Rational(int) / that
 
-
-  def main(args: Array[String]): Unit = {
-    val int: Int = 42
-    val rational: Rational = Rational(13, 15)
-    println(int - rational)
-  }
-
+  
 end Homework
-
-
