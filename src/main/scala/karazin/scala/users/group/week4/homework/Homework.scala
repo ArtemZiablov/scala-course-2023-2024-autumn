@@ -35,7 +35,7 @@ object Homework:
 
     infix def contains(x: Int): Boolean = false
 
-    infix def remove(x: Int): IntSet = throw new Exception("You can`t remove an element from an empty set")
+    infix def remove(x: Int): IntSet = Empty
 
     @targetName("union")
     infix def ∪(that: IntSet): IntSet = that
@@ -51,10 +51,12 @@ object Homework:
 
     override def toString: String = "[*]"
 
-    override def equals(other: Any): Boolean =
-      if (!other.isInstanceOf[Empty]) then false
-      else
-        true
+    override def equals(other: Any): Boolean = other match {
+      case _: Empty => true
+      case _ => false
+    }
+
+    override def hashCode(): Int = 0
 
   end Empty
 
@@ -72,7 +74,8 @@ object Homework:
 
     // Optional task
     infix def remove(x: Int): IntSet =
-      if x < elem then
+      if !this.contains(x) then throw new NoSuchElementException("There is no such element in the set")
+      else if x < elem then
         NonEmpty(elem, left.remove(x), right)
       else if x > elem then
         NonEmpty(elem, left, right.remove(x))
@@ -127,11 +130,19 @@ object Homework:
 
     override def toString: String = s"[$left - [$elem] - $right]"
 
+    override def hashCode(): Int =
+      val prime = 31
+      prime * (prime * (prime + elem.hashCode()) + left.##) + right.##
+
     override def equals(other: Any): Boolean =
-      if !other.isInstanceOf[NonEmpty] then false
-      else
-        val newOther = other.asInstanceOf[NonEmpty]
-        (this.elem == newOther.elem) && (this.left == newOther.left) && (this.left == newOther.left)
+      other match {
+        case that: NonEmpty =>
+          this.elem == that.elem &&
+            this.left == that.left &&
+            this.right == that.right &&
+            this.hashCode() == that.hashCode()
+        case _ => false
+      }
 
   end NonEmpty
 

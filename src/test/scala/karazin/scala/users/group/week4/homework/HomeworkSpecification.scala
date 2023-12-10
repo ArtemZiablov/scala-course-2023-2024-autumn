@@ -1,9 +1,11 @@
 package karazin.scala.users.group.week4.homework
 
-import org.scalacheck._
-import Prop.{forAll, propBoolean}
+import org.scalacheck.*
+import Prop.{forAll, propBoolean, throws}
 import arbitraries.given
-import Homework._
+import Homework.*
+
+import scala.annotation.tailrec
 
 object HomeworkSpecification extends Properties("Homework"):
 
@@ -63,6 +65,14 @@ object EmptySpecification extends Properties("Empty"):
 
 end EmptySpecification
 
+
+def toSet(intSet: IntSet): Set[Int] =
+  if intSet.isInstanceOf[Empty] then Set.empty[Int]
+  else
+    val nonEmpty = intSet.asInstanceOf[NonEmpty]
+    Set(nonEmpty.elem) ++ toSet(nonEmpty.left) ++ toSet(nonEmpty.right)
+
+
 // Add additional cases if needed
 object NonEmptySpecification extends Properties("NonEmpty"):
   import arbitraries.{given Arbitrary[Int], given Arbitrary[NonEmpty], given Arbitrary[IntSet]}
@@ -76,31 +86,41 @@ object NonEmptySpecification extends Properties("NonEmpty"):
   }
 
   property("include") = forAll { (nonEmpty: NonEmpty, element: Int) ⇒
-    false
+    toSet(nonEmpty include element) == (toSet(nonEmpty) + element)
   }
 
   property("contains") = forAll { (nonEmpty: NonEmpty, element: Int) ⇒
-    false
+    (nonEmpty contains element) == (toSet(nonEmpty) contains element)
   }
 
   property("remove") = forAll { (nonEmpty: NonEmpty, element: Int) ⇒
-    false
+    if !(toSet(nonEmpty) contains element) then true
+    else
+      toSet(nonEmpty remove  element) == (toSet(nonEmpty) - element)
+  }
+
+  property("remove throws an exception, when there is no such element") = forAll { (nonEmpty: NonEmpty, element: Int) ⇒
+    if !(toSet(nonEmpty) contains element) then
+      throws(classOf[NoSuchElementException]) {
+        toSet(nonEmpty remove element) == (toSet(nonEmpty) - element)
+      }
+    else true
   }
 
   property("union") = forAll { (nonEmpty: NonEmpty, set: IntSet) ⇒
-    false
+    toSet(nonEmpty ∪ set) == (toSet(nonEmpty) union toSet(set))
   }
 
   property("intersection") = forAll { (nonEmpty: NonEmpty, set: IntSet) ⇒
-    false
+    toSet(nonEmpty ∩ set) == (toSet(nonEmpty) intersect toSet(set))
   }
 
   property("complement") = forAll { (nonEmpty: NonEmpty, set: IntSet) ⇒
-    false
+    toSet(nonEmpty ∖ set) == (toSet(nonEmpty) diff toSet(set))
   }
 
   property("disjunctive") = forAll { (nonEmpty: NonEmpty, set: IntSet) ⇒
-    false
+    toSet(nonEmpty ∆ set) == ((toSet(nonEmpty) diff toSet(set)) union (toSet(set) diff toSet(nonEmpty)))
   }
 
 end NonEmptySpecification
