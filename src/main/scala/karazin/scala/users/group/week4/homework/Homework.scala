@@ -96,23 +96,23 @@ object Homework:
             findMinElemInRight(nonEmptySet.left)
         case _ => throw new NoSuchElementException("Empty set has no minimum element")
       }
-
-
+    
     @targetName("union")
     infix def ∪(that: IntSet): IntSet =
       if !that.isInstanceOf[NonEmpty] then this
       else
         val newThat = that.asInstanceOf[NonEmpty]
         this.include(newThat.elem) ∪ newThat.left ∪ newThat.right
-
+    
     @targetName("intersection")
-    infix def ∩(that: IntSet): IntSet =
-      if !that.isInstanceOf[NonEmpty] then Empty
+    infix def ∩(that: IntSet): IntSet = 
+      if (this.isInstanceOf[Empty]) then Empty
       else
-        val newThat = that.asInstanceOf[NonEmpty]
-        if this contains newThat.elem then NonEmpty(newThat.elem, this ∩ newThat.left, this ∩ newThat.right)
-        else (this ∩ newThat.left) ∪ (this ∩ newThat.left)
-
+        val nonEmptyThis = this.asInstanceOf[NonEmpty]
+        if (that contains nonEmptyThis.elem)
+          then NonEmpty(nonEmptyThis.elem, nonEmptyThis.left ∩ that, nonEmptyThis.right ∩ that)
+        else
+          nonEmptyThis.left ∩ that ∪ nonEmptyThis.right ∩ that
 
     @targetName("complement")
     infix def ∖(that: IntSet): IntSet =
@@ -145,30 +145,7 @@ object Homework:
       }
 
   end NonEmpty
-
-  def main(args: Array[String]): Unit = {
-    /*val v1_ = Empty
-    val v1 = v1_ include 4 include 3 include 1 include 2 include 0 include -1
-    val v2_ = Empty
-    val v2 = v2_.include(3).include(5).include(6).include(7).include(0).include(-6)
-
-    val v3_ = Empty
-    val v3 = v3_.include(0).include(-1).include(5).include(10).include(7).include(6).include(8).include(13).include(12).include(11).include(14)
-    println(v3)
-    println()
-    println(v3 remove 10)*/
-
-    val v1_ = Empty
-    val v1 = v1_.include(4).include(3).include(1).include(2).include(0).include(-1)
-    println(v1)
-
-    println(v1 remove 1)
-
-
-  }
-
-
-
+  
 end Homework
 
 
