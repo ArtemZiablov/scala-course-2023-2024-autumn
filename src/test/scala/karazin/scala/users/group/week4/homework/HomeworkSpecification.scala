@@ -66,11 +66,9 @@ object EmptySpecification extends Properties("Empty"):
 end EmptySpecification
 
 
-def toSet(intSet: IntSet): Set[Int] =
-  if intSet.isInstanceOf[Empty] then Set.empty[Int]
-  else
-    val nonEmpty = intSet.asInstanceOf[NonEmpty]
-    Set(nonEmpty.elem) ++ toSet(nonEmpty.left) ++ toSet(nonEmpty.right)
+def toSet(intSet: IntSet): Set[Int] = intSet match
+  case Empty => Set.empty[Int]
+  case NonEmpty(element, left, right) => Set(element) ++ toSet(left) ++ toSet(right)
 
 
 // Add additional cases if needed

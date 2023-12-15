@@ -76,57 +76,38 @@ object Homework:
     infix def remove(x: Int): IntSet =
       if !this.contains(x) then throw new NoSuchElementException("There is no such element in the set")
       else if x < elem then
-        NonEmpty(elem, left.remove(x), right)
+        NonEmpty(elem, left remove x, right)
       else if x > elem then
-        NonEmpty(elem, left, right.remove(x))
-      else if left == Empty && right == Empty then Empty
-      else if left == Empty then right
-      else if right == Empty then left
-      else
-        val minElemInRight = findMinElemInRight(right)
-        val newRight = right.remove(minElemInRight)
-        NonEmpty(minElemInRight, left, newRight)
+        NonEmpty(elem, left, right remove x)
+      else left ∪ right
 
-    @tailrec
-    private def findMinElemInRight(set: IntSet): Int =
-      set match {
-        case nonEmptySet: NonEmpty =>
-          if nonEmptySet.left == Empty then nonEmptySet.elem
-          else
-            findMinElemInRight(nonEmptySet.left)
-        case _ => throw new NoSuchElementException("Empty set has no minimum element")
-      }
-    
     @targetName("union")
-    infix def ∪(that: IntSet): IntSet =
-      if !that.isInstanceOf[NonEmpty] then this
-      else
-        val newThat = that.asInstanceOf[NonEmpty]
-        this.include(newThat.elem) ∪ newThat.left ∪ newThat.right
-    
+    infix def ∪(that: IntSet): IntSet = that match
+      case NonEmpty(element, left, right) => (this include element) ∪ left ∪ right
+      case Empty => this
+
+
     @targetName("intersection")
-    infix def ∩(that: IntSet): IntSet = 
-      if (this.isInstanceOf[Empty]) then Empty
-      else
-        val nonEmptyThis = this.asInstanceOf[NonEmpty]
-        if (that contains nonEmptyThis.elem)
-          then NonEmpty(nonEmptyThis.elem, nonEmptyThis.left ∩ that, nonEmptyThis.right ∩ that)
-        else
-          nonEmptyThis.left ∩ that ∪ nonEmptyThis.right ∩ that
+    infix def ∩(that: IntSet): IntSet = that match
+      case Empty => Empty
+      case NonEmpty(element, left, right) =>
+        if (this contains element) then NonEmpty(element, left ∩ this, right ∩ this)
+        else left ∩ this ∪ right ∩ this
+
 
     @targetName("complement")
-    infix def ∖(that: IntSet): IntSet =
-      if !that.isInstanceOf[NonEmpty] then this
-      else
-        val newThat = that.asInstanceOf[NonEmpty]
-        if newThat contains this.elem then (this.left ∖  newThat) ∪ (this.right ∖ newThat)
-        else NonEmpty(this.elem, this.left ∖ newThat, this.right ∖ newThat)
+    infix def ∖(that: IntSet): IntSet = that match
+      case Empty => this
+      case NonEmpty(element, left, right) =>
+        if that contains this.elem then (this.left ∖ that) ∪ (this.right ∖ that)
+        else NonEmpty(this.elem, this.left ∖ that, this.right ∖ that)
+
 
     @targetName("disjunctive union")
-    infix def ∆(that: IntSet): IntSet =
-      if !that.isInstanceOf[NonEmpty] then this
-      else
-        (this ∖ that) ∪ (that ∖ this)
+    infix def ∆(that: IntSet): IntSet = that match
+      case Empty => this
+      case _ => (this ∖ that) ∪ (that ∖ this)
+
 
     override def toString: String = s"[$left - [$elem] - $right]"
 
@@ -135,14 +116,14 @@ object Homework:
       prime * (prime * (prime + elem.hashCode()) + left.##) + right.##
 
     override def equals(other: Any): Boolean =
-      other match {
+      other match 
         case that: NonEmpty =>
           this.elem == that.elem &&
             this.left == that.left &&
             this.right == that.right &&
             this.hashCode() == that.hashCode()
         case _ => false
-      }
+      
 
   end NonEmpty
   
