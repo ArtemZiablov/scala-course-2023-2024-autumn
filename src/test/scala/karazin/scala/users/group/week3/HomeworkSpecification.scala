@@ -17,7 +17,7 @@ end HomeworkSpecification
 
 
 object ZeroSpecification extends Properties("Zero"):
-  import arbitraries.{given Arbitrary[Zero], given Arbitrary[Nat]}
+  import arbitraries.{given Arbitrary[Zero], given Arbitrary[Nat], given Arbitrary[Succ]}
 
   property("check isZero") = forAll { (zero: Zero) =>
     zero.isZero
@@ -33,10 +33,13 @@ object ZeroSpecification extends Properties("Zero"):
     (zero + nat) == nat
   }
 
-  property("throw exception due to subtracting a nat from zero") = forAll { (zero: Zero, nat: Nat) =>
+  property("subtract zero from zero") = forAll { (zero: Zero) =>
+    (zero - zero) == Zero
+  }
+
+  property("throw exception due to subtracting a successor from zero") = forAll { (zero: Zero, succ: Succ) =>
     throws(classOf[IllegalArgumentException]) {
-      val newNat = if isZero(nat) then successor(nat) else nat
-      zero - newNat
+      zero - succ
     }
   }
 
@@ -57,7 +60,7 @@ end ZeroSpecification
 
 
 object SuccSpecification extends Properties("Succ"):
-  import arbitraries.{given Arbitrary[Succ], given Arbitrary[Nat] }
+  import arbitraries.{given Arbitrary[Succ], given Arbitrary[Nat], given Arbitrary[Zero] }
 
   property("Successor is not Zero") = forAll { (succ: Succ) =>
     !succ.isZero
@@ -87,6 +90,10 @@ object SuccSpecification extends Properties("Succ"):
         val newRight = Succ(right)
         toInt(left - newRight) == (toInt(left) - toInt(newRight))
     }
+  }
+
+  property("Succ subtract Zero") = forAll { (succ: Succ, zero: Zero) =>
+    (succ - zero) == succ
   }
 
   property("Succ to Int") = forAll { (succ: Succ) =>

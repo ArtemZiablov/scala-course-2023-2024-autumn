@@ -60,8 +60,7 @@ object Homework:
       else this
     
     infix def -(that: Nat): Nat =
-      if !this.isZero && !that.isZero then this.predecessor - that.predecessor
-      else if this.isZero then that
+      if !that.isZero then this.predecessor - that.predecessor
       else this
     
     // Optional task
