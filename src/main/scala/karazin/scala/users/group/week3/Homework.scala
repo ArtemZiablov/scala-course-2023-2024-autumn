@@ -43,12 +43,6 @@ object Homework:
 
     override def toString: String = "Zero"
 
-    /*override def equals(obj: Any): Boolean =
-      if(!obj.isInstanceOf[Nat]) then false
-      else
-        val that = obj.asInstanceOf[Nat]
-        this.isZero && that.isZero*/
-
     override def equals(obj: Any): Boolean = obj match
       case that: Zero =>
         (this.isZero == that.isZero) &&
