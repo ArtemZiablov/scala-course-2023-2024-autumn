@@ -92,17 +92,12 @@ object NonEmptySpecification extends Properties("NonEmpty"):
   }
 
   property("remove") = forAll { (nonEmpty: NonEmpty, element: Int) ⇒
-    if !(toSet(nonEmpty) contains element) then true
-    else
-      toSet(nonEmpty remove  element) == (toSet(nonEmpty) - element)
-  }
-
-  property("remove throws an exception, when there is no such element") = forAll { (nonEmpty: NonEmpty, element: Int) ⇒
     if !(toSet(nonEmpty) contains element) then
       throws(classOf[NoSuchElementException]) {
         toSet(nonEmpty remove element) == (toSet(nonEmpty) - element)
       }
-    else true
+    else
+      toSet(nonEmpty remove  element) == (toSet(nonEmpty) - element)
   }
 
   property("union") = forAll { (nonEmpty: NonEmpty, set: IntSet) ⇒
