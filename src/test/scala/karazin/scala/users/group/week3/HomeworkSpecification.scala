@@ -4,8 +4,11 @@ import scala.math.*
 import org.scalacheck.{Arbitrary, *}
 import Prop.{forAll, propBoolean, throws}
 import Homework.*
+import karazin.scala.users.group.week3.arbitraries.restricted._
 import karazin.scala.users.group.week3.arbitraries.succ
-import utils._
+import utils.*
+
+import scala.language.implicitConversions
 
 object HomeworkSpecification extends Properties("Homework"):
 
@@ -47,9 +50,8 @@ object ZeroSpecification extends Properties("Zero"):
     zero.toInt == 0
   }
 
-  property("Zero from Int") = forAll { (int: Int) =>
-    val newZero = if int != 0 then 0 else int
-    Zero.fromInt(newZero) == fromInt(0)
+  property("Zero from Int") = forAll { (zero: ZeroInteger) =>
+    Zero.fromInt(zero) == fromInt(0)
   }
 
   property("Zero equals") = forAll { (zero1: Zero, zero2: Zero) =>
@@ -147,18 +149,13 @@ object NatSpecification extends Properties("Nat"):
     nat.toInt == toInt(nat)
   }
 
-  property("Nat from positive Int") = forAll { (int: Int) =>
-    val newInt = if int < 0 then abs(int) else int
-    Zero.fromInt(newInt) == fromInt(newInt)
+  property("Nat from positive Int") = forAll { (int: PositiveInteger) =>
+    Zero.fromInt(int) == fromInt(int)
   }
 
-  property("Nat from negative Int throws exception") = forAll { (int: Int) =>
+  property("Nat from negative Int throws exception") = forAll { (int: NegativeInteger) =>
     throws(classOf[IllegalArgumentException]){
-      val newInt =
-        if int < 0 then int
-        else if int > 0 then -int
-        else -1
-      Zero.fromInt(newInt)
+      Zero.fromInt(int)
     }
   }
 
