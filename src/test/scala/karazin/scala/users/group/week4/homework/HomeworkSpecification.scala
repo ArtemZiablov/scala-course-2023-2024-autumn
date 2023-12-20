@@ -1,4 +1,5 @@
 package karazin.scala.users.group.week4.homework
+import scala.language.implicitConversions
 
 import org.scalacheck.*
 import Prop.{forAll, propBoolean, throws}
@@ -73,7 +74,7 @@ def toSet(intSet: IntSet): Set[Int] = intSet match
 
 // Add additional cases if needed
 object NonEmptySpecification extends Properties("NonEmpty"):
-  import arbitraries.{given Arbitrary[Int], given Arbitrary[NonEmpty], given Arbitrary[IntSet]}
+  import arbitraries.{given Arbitrary[Int], given Arbitrary[NonEmpty], given Arbitrary[IntSet], given Arbitrary[(IntSet, Int)]}
 
   property("not equals to Empty") = forAll { (nonEmpty: NonEmpty) ⇒
     nonEmpty != Empty
@@ -91,13 +92,30 @@ object NonEmptySpecification extends Properties("NonEmpty"):
     (nonEmpty contains element) == (toSet(nonEmpty) contains element)
   }
 
-  property("remove") = forAll { (nonEmpty: NonEmpty, element: Int) ⇒
-    if !(toSet(nonEmpty) contains element) then
-      throws(classOf[NoSuchElementException]) {
-        toSet(nonEmpty remove element) == (toSet(nonEmpty) - element)
-      }
-    else
-      toSet(nonEmpty remove  element) == (toSet(nonEmpty) - element)
+  // first way how to make tests for "remove" method
+  property("1. remove when set contains element") = forAll { (nonEmpty: NonEmpty, element: Int) ⇒
+    toSet((nonEmpty include element) remove element) == ((toSet(nonEmpty) + element) - element)
+  }
+
+  property("1. remove when set doesn't contain element") = forAll { (nonEmpty: NonEmpty, element: Int) ⇒
+    throws(classOf[NoSuchElementException]) {
+      ((nonEmpty include element) remove element) remove element
+    }
+  }
+
+  // another way how to make tests for "remove" method
+  property("2. remove when set contains element") = forAll { (pair: (IntSet, Int)) ⇒
+    val nonEmpty = pair._1
+    val element = pair._2
+    toSet((nonEmpty include element) remove element) == ((toSet(nonEmpty) + element) - element)
+  }
+
+  property("2. remove when set doesn't contain element") = forAll { (pair: (Int, IntSet)) ⇒
+    throws(classOf[NoSuchElementException]) {
+      val nonEmpty = pair._2
+      val element = pair._1
+      nonEmpty remove element
+    }
   }
 
   property("union") = forAll { (nonEmpty: NonEmpty, set: IntSet) ⇒
