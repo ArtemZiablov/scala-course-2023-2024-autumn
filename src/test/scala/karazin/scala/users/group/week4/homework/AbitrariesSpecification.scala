@@ -31,4 +31,3 @@ object AbitrariesSpecification extends Properties("Abitraries"):
   }
 
 end AbitrariesSpecification
-

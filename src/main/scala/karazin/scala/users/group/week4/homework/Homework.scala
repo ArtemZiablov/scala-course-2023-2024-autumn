@@ -128,6 +128,3 @@ object Homework:
   end NonEmpty
 
 end Homework
-
-
-

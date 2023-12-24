@@ -49,3 +49,4 @@ object arbitraries:
   given Arbitrary[(IntSet, Int)] = Arbitrary(elementInNonEmpty)
 
   given Arbitrary[(Int, IntSet)] = Arbitrary(elementNotInNonEmpty)
+  
