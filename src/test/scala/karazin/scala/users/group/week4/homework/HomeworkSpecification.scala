@@ -105,15 +105,13 @@ object NonEmptySpecification extends Properties("NonEmpty"):
 
   // another way how to make tests for "remove" method
   property("2. remove when set contains element") = forAll { (pair: (IntSet, Int)) ⇒
-    val nonEmpty = pair._1
-    val element = pair._2
+    val (nonEmpty, element) = pair
     toSet((nonEmpty include element) remove element) == ((toSet(nonEmpty) + element) - element)
   }
 
   property("2. remove when set doesn't contain element") = forAll { (pair: (Int, IntSet)) ⇒
     throws(classOf[NoSuchElementException]) {
-      val nonEmpty = pair._2
-      val element = pair._1
+      val (element, nonEmpty) = pair
       nonEmpty remove element
     }
   }
