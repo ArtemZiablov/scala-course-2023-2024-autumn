@@ -28,6 +28,25 @@ object arbitraries:
       case Nil  ⇒ empty
       case list ⇒ Gen.frequency((1, nonEmpty(list)), (1, empty))
 
+  val elementInNonEmpty: Gen[(IntSet, Int)] = for {
+    nonEmptySet <- nonEmptySortedList flatMap {
+      nonEmpty(_)
+    }
+    element <- smallInteger
+  } yield (nonEmptySet include element, element)
+
+  val elementNotInNonEmpty: Gen[(Int, IntSet)] = for {
+    element <- smallInteger
+    nonEmptySet <- nonEmptySortedList flatMap {
+      nonEmpty(_)
+    }
+  } yield (element, (nonEmptySet include element) remove element)
+
   given Arbitrary[NonEmpty] = Arbitrary( nonEmptySortedList flatMap { nonEmpty(_) } )
   
   given Arbitrary[IntSet] = Arbitrary(nonEmptySortedList flatMap { intSet(_) } )
+
+  given Arbitrary[(IntSet, Int)] = Arbitrary(elementInNonEmpty)
+
+  given Arbitrary[(Int, IntSet)] = Arbitrary(elementNotInNonEmpty)
+  

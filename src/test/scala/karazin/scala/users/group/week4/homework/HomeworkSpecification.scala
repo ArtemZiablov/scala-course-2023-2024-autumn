@@ -1,9 +1,12 @@
 package karazin.scala.users.group.week4.homework
+import scala.language.implicitConversions
 
-import org.scalacheck._
-import Prop.{forAll, propBoolean}
+import org.scalacheck.*
+import Prop.{forAll, propBoolean, throws}
 import arbitraries.given
-import Homework._
+import Homework.*
+
+import scala.annotation.tailrec
 
 object HomeworkSpecification extends Properties("Homework"):
 
@@ -63,9 +66,15 @@ object EmptySpecification extends Properties("Empty"):
 
 end EmptySpecification
 
+
+def toSet(intSet: IntSet): Set[Int] = intSet match
+  case Empty => Set.empty[Int]
+  case NonEmpty(element, left, right) => Set(element) ++ toSet(left) ++ toSet(right)
+
+
 // Add additional cases if needed
 object NonEmptySpecification extends Properties("NonEmpty"):
-  import arbitraries.{given Arbitrary[Int], given Arbitrary[NonEmpty], given Arbitrary[IntSet]}
+  import arbitraries.{given Arbitrary[Int], given Arbitrary[NonEmpty], given Arbitrary[IntSet], given Arbitrary[(IntSet, Int)]}
 
   property("not equals to Empty") = forAll { (nonEmpty: NonEmpty) ⇒
     nonEmpty != Empty
@@ -76,31 +85,51 @@ object NonEmptySpecification extends Properties("NonEmpty"):
   }
 
   property("include") = forAll { (nonEmpty: NonEmpty, element: Int) ⇒
-    false
+    toSet(nonEmpty include element) == (toSet(nonEmpty) + element)
   }
 
   property("contains") = forAll { (nonEmpty: NonEmpty, element: Int) ⇒
-    false
+    (nonEmpty contains element) == (toSet(nonEmpty) contains element)
   }
 
-  property("remove") = forAll { (nonEmpty: NonEmpty, element: Int) ⇒
-    false
+  // first way how to make tests for "remove" method
+  property("1. remove when set contains element") = forAll { (nonEmpty: NonEmpty, element: Int) ⇒
+    toSet((nonEmpty include element) remove element) == ((toSet(nonEmpty) + element) - element)
+  }
+
+  property("1. remove when set doesn't contain element") = forAll { (nonEmpty: NonEmpty, element: Int) ⇒
+    throws(classOf[NoSuchElementException]) {
+      ((nonEmpty include element) remove element) remove element
+    }
+  }
+
+  // another way how to make tests for "remove" method
+  property("2. remove when set contains element") = forAll { (pair: (IntSet, Int)) ⇒
+    val (nonEmpty, element) = pair
+    toSet((nonEmpty include element) remove element) == ((toSet(nonEmpty) + element) - element)
+  }
+
+  property("2. remove when set doesn't contain element") = forAll { (pair: (Int, IntSet)) ⇒
+    throws(classOf[NoSuchElementException]) {
+      val (element, nonEmpty) = pair
+      nonEmpty remove element
+    }
   }
 
   property("union") = forAll { (nonEmpty: NonEmpty, set: IntSet) ⇒
-    false
+    toSet(nonEmpty ∪ set) == (toSet(nonEmpty) union toSet(set))
   }
 
   property("intersection") = forAll { (nonEmpty: NonEmpty, set: IntSet) ⇒
-    false
+    toSet(nonEmpty ∩ set) == (toSet(nonEmpty) intersect toSet(set))
   }
 
   property("complement") = forAll { (nonEmpty: NonEmpty, set: IntSet) ⇒
-    false
+    toSet(nonEmpty ∖ set) == (toSet(nonEmpty) diff toSet(set))
   }
 
   property("disjunctive") = forAll { (nonEmpty: NonEmpty, set: IntSet) ⇒
-    false
+    toSet(nonEmpty ∆ set) == ((toSet(nonEmpty) diff toSet(set)) union (toSet(set) diff toSet(nonEmpty)))
   }
 
 end NonEmptySpecification
