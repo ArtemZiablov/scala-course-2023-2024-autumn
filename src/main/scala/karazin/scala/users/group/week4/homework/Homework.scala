@@ -116,17 +116,17 @@ object Homework:
       prime * (prime * (prime + elem.hashCode()) + left.##) + right.##
 
     override def equals(other: Any): Boolean =
-      other match 
+      other match
         case that: NonEmpty =>
           this.elem == that.elem &&
             this.left == that.left &&
             this.right == that.right &&
             this.hashCode() == that.hashCode()
         case _ => false
-      
+
 
   end NonEmpty
-  
+
 end Homework
 
 
